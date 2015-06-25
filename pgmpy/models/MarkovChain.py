@@ -5,22 +5,22 @@ import networkx as nx
 from pgmpy.utils import sample_discrete
 
 
-class MarkovChainMonteCarlo(nx.DiGraph):
+class MarkovChain(nx.DiGraph):
     """
     Class to represent a Markov Chain, along with methods to simulate a run.
 
     Examples:
     ---------
     Create an empty Markov Chain:
-    >>> from pgmpy.models import MarkovChainMonteCarlo as MCMC
-    >>> model = MCMC()
+    >>> from pgmpy.models import MarkovChain as MC
+    >>> model = MC()
 
     And then add edges to it
     >>> model.add_weighted_edges_from([(-1, 0, 0.25), (-1, -1, 0.75), (0, -1, 0.25), (0, 1, 0.25),
     ...     (0, 0, 0.5), (1, 0, 0.25), (1, 1, 0.75)])
 
     Or directly create a Markov Chain from a list of edges
-    >>> model = MCMC([(-1, 0, 0.25), (-1, -1, 0.75), (0, -1, 0.25), (0, 1, 0.25),
+    >>> model = MC([(-1, 0, 0.25), (-1, -1, 0.75), (0, -1, 0.25), (0, 1, 0.25),
     ...     (0, 0, 0.5), (1, 0, 0.25), (1, 1, 0.75)])
 
     Set a start state
@@ -71,8 +71,8 @@ class MarkovChainMonteCarlo(nx.DiGraph):
 
         Examples
         --------
-        >>> from pgmpy.models import MarkovChainMonteCarlo as MCMC
-        >>> model = MCMC()
+        >>> from pgmpy.models import MarkovChain as MC
+        >>> model = MC()
         >>> model.add_node(0)
         """
         super().add_node(node, **kwargs)
@@ -93,8 +93,8 @@ class MarkovChainMonteCarlo(nx.DiGraph):
 
         Examples:
         ---------
-        >>> from pgmpy.models import MarkovChainMonteCarlo as MCMC
-        >>> model = MCMC()
+        >>> from pgmpy.models import MarkovChain as MC
+        >>> model = MC()
         >>> model.add_weighted_edges_from([(0, 1, 0.25), (0, -1, 0.5)])
         """
         self.reset_weights()
@@ -112,8 +112,8 @@ class MarkovChainMonteCarlo(nx.DiGraph):
 
         Examples:
         ---------
-        >>> from pgmpy.models import MarkovChainMonteCarlo as MCMC
-        >>> models = MCMC()
+        >>> from pgmpy.models import MarkovChain as MC
+        >>> models = MC()
         >>> models.add_node(0)
         >>> models.set_start_state(0)
         """
@@ -129,8 +129,8 @@ class MarkovChainMonteCarlo(nx.DiGraph):
 
         Examples:
         ---------
-        >>> from pgmpy.models import MarkovChainMonteCarlo as MCMC
-        >>> model = MCMC()
+        >>> from pgmpy.models import MarkovChain as MC
+        >>> model = MC()
         >>> model.reset_weights()
         """
         for node in self.weights:
@@ -144,8 +144,8 @@ class MarkovChainMonteCarlo(nx.DiGraph):
 
         Examples:
         ---------
-        >>> from pgmpy.models import MarkovChainMonteCarlo as MCMC
-        >>> model = MCMC([(0, 1, 0.25), (0, -1, 0.25), (0, 0, 0.5), (1, 1, 1), (-1, -1, 1)])
+        >>> from pgmpy.models import MarkovChain as MC
+        >>> model = MC([(0, 1, 0.25), (0, -1, 0.25), (0, 0, 0.5), (1, 1, 1), (-1, -1, 1)])
         >>> model.check_markov_chain()
         True
         """
@@ -165,8 +165,8 @@ class MarkovChainMonteCarlo(nx.DiGraph):
         """
         Returns the probability distribution on the states of the Markov Chain.
 
-        >>> from pgmpy.models import MarkovChainMonteCarlo as MCMC
-        >>> model = MCMC([(0, 1, 0.25), (0, -1, 0.25), (0, 0, 0.5), (1, 1, 1), (-1, -1, 1)])
+        >>> from pgmpy.models import MarkovChain as MC
+        >>> model = MC([(0, 1, 0.25), (0, -1, 0.25), (0, 0, 0.5), (1, 1, 1), (-1, -1, 1)])
         >>> model.set_start_state(0)
         >>> model.weights
         {-1: 0, 0: 1, 1: 0}
@@ -186,8 +186,8 @@ class MarkovChainMonteCarlo(nx.DiGraph):
 
         Examples:
         ---------
-        >>> from pgmpy.models import MarkovChainMonteCarlo as MCMC
-        >>> model = MCMC([(0, 1, 0.25), (0, -1, 0.25), (0, 0, 0.5), (1, 1, 1), (-1, -1, 1)])
+        >>> from pgmpy.models import MarkovChain as MC
+        >>> model = MC([(0, 1, 0.25), (0, -1, 0.25), (0, 0, 0.5), (1, 1, 1), (-1, -1, 1)])
         >>> model.weights = {0: 0.1, -1: 0.5, 1: 0.4}
         """
         if not isinstance(new_weights, dict):
@@ -211,8 +211,8 @@ class MarkovChainMonteCarlo(nx.DiGraph):
 
         Examples:
         ---------
-        >>> from pgmpy.models import MarkovChainMonteCarlo as MCMC
-        >>> model = MCMC([(0, 1, 0.25), (0, -1, 0.25), (0, 0, 0.5), (1, 1, 1), (-1, -1, 1)])
+        >>> from pgmpy.models import MarkovChain as MC
+        >>> model = MC([(0, 1, 0.25), (0, -1, 0.25), (0, 0, 0.5), (1, 1, 1), (-1, -1, 1)])
         >>> model.set_start_state(0)
         >>> model.sample(5)
         array([ 0.,  0.,  0.,  0.,  1.])
