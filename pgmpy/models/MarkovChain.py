@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 import networkx as nx
+from pandas import DataFrame
 
 from pgmpy.utils import sample_discrete
 
@@ -223,4 +224,69 @@ class MarkovChain(nx.DiGraph):
             values = np.array(list(self.edge[sampled[i]].keys()))
             weights = list(map(lambda x: x['weight'], self.edge[sampled[i]].values()))
             sampled[i + 1] = sample_discrete(values, weights)[0]
+        return sampled
+
+
+class MultiKernelMarkovChain(object):
+    def __init__(self, variables=None, card=None):
+        # is card needed? put a check on card
+        if variables is None:
+            variables = []
+        if card is None:
+            card = []
+        assert isinstance(card, list)
+        assert isinstance(variables, list)
+        self.variables = variables
+        print(variables, card)
+        self.cardinalities = {v: c for v, c in zip(variables, card)}
+        self.transition_models = {}
+
+    def add_variable(self, variable, card=0):
+        assert variable not in self.variables
+        self.variables.append(variable)
+        self.cardinalities[variable] = card
+        self.transition_models[variable] = {}
+
+    def add_transition_model(self, variable, transition_model):
+        # check if the transition model is valid
+        if not isinstance(transition_model, dict):
+            raise ValueError('Transition model must be a dict.')
+        if not set(transition_model.keys()) == set(range(self.cardinalities[variable])):
+            raise ValueError('Transitions must be defined for all states of variable {var}.'.format(var=variable))
+        for var, transition in transition_model.items():
+            if not isinstance(transition, dict):
+                raise ValueError('Each transition must be a dict.')
+            prob_sum = 0
+            for _, prob in transition.items():
+                if prob < 0 or prob > 1:
+                    raise ValueError('Transitions must represent valid probability weights.')
+                prob_sum += prob
+            if not np.allclose(prob_sum, 1):
+                raise ValueError('Transition probabilities must sum to 1.')
+
+        self.transition_models[variable] = transition_model
+        if variable not in self.variables:
+            self.variables.append(variable)
+            self.cardinalities[variable] = len(transition_model)
+
+    def sample(self, start_state, size=1):
+        # check if the start state is valid
+        if not isinstance(start_state, dict):
+            raise ValueError('Start state must be a dict.')
+        if not set(start_state.keys()) == set(self.transition_models.keys()):
+            raise ValueError('Start state must represent a complete assignment to all variables.')
+        for var, val in start_state.items():
+            if val >= self.cardinalities[var]:
+                raise ValueError('Assignment {val} to {var} invalid.'.format(val=val, var=var))
+
+        curr_state = start_state
+        sampled = DataFrame(index=range(size), columns=self.variables)
+        sampled.loc[0] = [start_state[var] for var in self.variables]
+        for i in range(size - 1):
+            for var in self.variables:
+                val = curr_state[var]
+                next_val = sample_discrete(list(self.transition_models[var][val].keys()),
+                                           list(self.transition_models[var][val].values()))[0]
+                curr_state[var] = next_val
+            sampled.loc [i + 1] = [curr_state[var] for var in self.variables]
         return sampled
